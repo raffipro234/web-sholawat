@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sholawat Premium Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f5f5f7;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text-color: #1d1d1f;
+            --accent: #007aff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-color: #ffffff;
+            --accent: #0a84ff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- BACKGROUND EFFECTS --- */
+        .bg-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Light Mode: Glow */
+        .glow-light {
+            background: radial-gradient(circle at 20% 30%, rgba(0,122,255,0.1), transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.9), transparent 40%);
+            animation: moveGlow 15s infinite alternate;
+        }
+
+        /* Dark Mode: Stars */
+        .stars-dark {
+            display: none;
+            background: transparent;
+        }
+        [data-theme="dark"] .stars-dark {
+            display: block;
+            background-image: radial-gradient(white, rgba(255,255,255,0.2) 2px, transparent 40px);
+            background-size: 100px 100px;
+            animation: moveStars 20s linear infinite;
+        }
+
+        @keyframes moveGlow { 0% { transform: scale(1); } 100% { transform: scale(1.2) translate(20px, 20px); } }
+        @keyframes moveStars { from { background-position: 0 0; } to { background-position: 0 1000px; } }
+
+        /* --- THEME TOGGLE MENU --- */
+        .theme-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .theme-btn {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(128,128,128,0.2);
+            padding: 10px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* --- WELCOME SCREEN (KOTAK IPHONE) --- */
+        #welcome-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .iphone-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            width: 320px;
+            padding: 40px 20px;
+            border-radius: 50px; /* Sangat bulat ala iPhone */
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 25px;
+            object-fit: cover;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* --- MAIN CONTENT --- */
+        #main-content {
+            display: none;
+            padding-bottom: 120px;
+        }
+
+        .banner {
+            width: 90%;
+            max-width: 800px;
+            height: 180px;
+            margin: 80px auto 30px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .banner h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; z-index: 2; }
+
+        .song-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .song-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            margin-bottom: 12px;
+            padding: 18px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(128,128,128,0.1);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .song-card:hover { transform: scale(1.02); background: white; }
+        [data-theme="dark"] .song-card:hover { background: #2c2c2e; }
+
+        /* --- PLAYER BAR --- */
+        #player-bar {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            background: var(--card-bg);
+            backdrop-filter: blur(25px);
+            padding: 20px;
+            border-radius: 30px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2000;
+        }
+        #player-bar.active { bottom: 30px; }
+
+        #player-ui { width: 100%; margin-top: 10px; }
+    </style>
+</head>
+<body data-theme="light">
+
+    <div class="bg-effect glow-light" id="light-bg"></div>
+    <div class="bg-effect stars-dark" id="dark-bg"></div>
+
+    <div class="theme-menu">
+        <button class="theme-btn" onclick="toggleTheme()" id="theme-text">🌙 Dark Mode</button>
+    </div>
+
+    <div id="welcome-screen">
+        <div class="iphone-card">
+            <img src="https://j.top4top.io/s_3701m0mi01.jpg" class="profile-img">
+            <h2 style="margin: 0;">Gema Sholawat</h2>
+            <p style="color: #86868b; font-size: 14px; padding: 0 10px;">"Mengetuk pintu langit melalui lantunan rindu kepada Sang Nabi."</p>
+            <p style="color: #86868b; font-size: 14px; padding: 0 10px;">"Create By @Raffioffci2"</p>
+            <button class="theme-btn" style="background: var(--accent); color: white; width: 80%; margin-top: 20px;" onclick="enterApp()">Masuk</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="banner">
+            <div style="position:absolute; width:100%; height:100%; background: rgba(0,0,0,0.2);"></div>
+            <h2>Website Sholawat</h2>
+        </div>
+
+        <div class="song-container" id="list-sholawat">
+            </div>
+    </div>
+
+    <div id="player-bar">
+        <div id="now-playing-title" style="font-weight: 600; font-size: 14px; text-align: center;">Memutar Lagu...</div>
+        <div id="player"></div>
+    </div>
+
+    <script>
+        const songs = [
+            { id: "8-NbT05VykQ", title: "Muhammad Nabina" },
+            { id: "j4cGkfKt1xE", title: "Sholawat Badar" },
+            { id: "-Nly_L_f4Ng", title: "Alla Alayka Rahman" },
+            { id: "n563A9crFr0", title: "Al Hijrotu" },
+            { id: "79yBAd6l-g4", title: "Waqtu Sahar" },
+            { id: "TQ-GUKazpmg", title: "Sholawat Medley" },
+            { id: "0RhbJ4Thlto", title: "Man Ana" },
+            { id: "aKPfV1I1zUQ", title: "Qolbi Fil Madinah" },
+            { id: "goK6ZDBgLcM", title: "Rindu Madinah" },
+            { id: "QYEpjkWyYGs", title: "Rahmatun Lil Alameen" },
+            { id: "vQ1E7EDCES0", title: "Thohal Basyir" },
+            { id: "Ii1jvubIC8g", title: "Maulana Ya Maulana" }
+        ];
+
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('theme-text');
+            if (body.getAttribute('data-theme') === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                btn.innerText = "☀️ Light Mode";
+            } else {
+                body.setAttribute('data-theme', 'light');
+                btn.innerText = "🌙 Dark Mode";
+            }
+        }
+
+        function enterApp() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            renderSongs();
+        }
+
+        function renderSongs() {
+            const container = document.getElementById('list-sholawat');
+            songs.forEach((song) => {
+                const div = document.createElement('div');
+                div.className = 'song-card';
+                div.onclick = () => playSong(song.id, song.title);
+                div.innerHTML = `
+                    <div style="background: var(--accent); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 15px;">▶</div>
+                    <span style="font-weight: 600;">${song.title}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // YouTube API
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '0', width: '0', videoId: '',
+                playerVars: { 'autoplay': 0, 'controls': 0 }
+            });
+        }
+
+        function playSong(id, title) {
+            player.loadVideoById(id);
+            document.getElementById('now-playing-title').innerText = title;
+            document.getElementById('player-bar').classList.add('active');
+        }
+    </script>
+</body>
+</html>
